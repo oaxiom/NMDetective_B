@@ -20,7 +20,7 @@ required arguments:
   -l LABEL, --label LABEL
                         a label for the output files
 
-Example usage: nmdetect -g <gtf_file> -l <outputlabel>
+Example usage: nmdetect -g gtf_file -l outputlabel
 
 ## Example
 
