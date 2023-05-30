@@ -36,23 +36,39 @@ class NMDB:
 
         for lin in gtfoh:
             l = lin.strip().split('\t')
-            # Split the attributes column
-            attrs = {}
-            for item in l[8].strip().split("; "):
-                if item:
-                    item = item.strip()
-                    ss = shlexsplit(item)
-                    key = ss[0]
-                    value = ss[1].strip('"')
-                    attrs[key] = value
+
+            # Try to do some quick fails to speed up
+            if l[2] == 'gene': # No useful data here
+                continue
+
+            if 'protein_coding' not in l[8]:
+                continue
+
+            tid = l[8].find('transcript_id')
 
             r = {'chrom': l[0],
                 'left': int(l[3]),
                 'right': int(l[4]),
                 'feature': l[2],
                 'strand': l[6],
+                'gene_type': 'protein_coding',
+                'transcript_id': l[8][tid:tid+50].split('"')[1]
                 }
-            r.update(attrs)
+
+            '''
+            # This is very slow, and as I just need the transcript_id I hack it out above;
+
+            # Split the attributes column
+            attrs = {}
+            for item in l[8].strip().split("; "):
+                if item:
+                    if '
+                    item = item.strip()
+                    ss = shlexsplit(item)
+                    key = ss[0]
+                    value = ss[1].strip('"')
+                    attrs[key] = value
+            '''
 
             yield r
 
@@ -80,11 +96,13 @@ class NMDB:
         return 0.65, 'Trigger NMD\n(Score=0.65)'
 
     def score(self, gtf_filename):
-
         self.log.info('Starting score')
 
         scores = []
         cats = []
+
+        # STATS
+        __skipped_no_start_stop = 0
 
         # First make bundles for each transcript
         transcript_bundles = {}
@@ -117,16 +135,6 @@ class NMDB:
             STOP = 0
 
             for entry in transcript:
-                '''
-                if entry['feature'] == 'transcript':
-                    if strand == '+':
-                        tss = entry['left']
-                        tts = entry['right']
-                    else:
-                        tss = entry['right']
-                        tts = entry['left']
-                '''
-
                 if entry['feature'] == 'start_codon': # This is not quite right as the codon is 3 bp. However, I think for these purposes it's close enough
                     START = entry['left']
                 elif entry['feature'] == 'stop_codon':
@@ -178,14 +186,11 @@ class NMDB:
                         # check it's not a UTR
                         if exons[0] <= START and exons[1] >= STOP:
                             orflength += exons[0] - exons[1]
-#0 21651836
-#1 21651779
+
             if START == 0 or STOP == 0:
                 log.info(f'{transcript_id} has no start_codon or stop_codon key in the GTF, skipping')
+                __skipped_no_start_stop += 1
                 continue
-
-            print(transcript_id, strand, START, STOP, exonStarts, exonEnds)
-            print(orflength)
 
             inlastexon = False
             within_50nt_of_lastEJ = False
@@ -216,6 +221,8 @@ class NMDB:
         self.scores = scores
         self.cats = cats
 
+        self.log.info(f'Skipped as no identifiable START/STOP: {__skipped_no_start_stop} transcripts')
+
         return scores, cats
 
     def plots(self, label):
@@ -224,12 +231,14 @@ class NMDB:
 
         '''
         # Pie chart;
+
         pie_summ = Counter(self.cats)
         fig = plot.figure(figsize=[3,3])
         ax = fig.add_subplot(111)
         ax.pie(pie_summ.values(), labels=pie_summ.keys(), autopct='%1.1f%%',
             textprops={'fontsize': 6})
         fig.savefig(f'{label}.pie.pdf')
+        self.log.info('Drew Pie chart')
 
 
 if __name__ == '__main__':
