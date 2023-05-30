@@ -49,7 +49,9 @@ def main():
 
     log = parser.log
 
-
+    log.info('Arguments:')
+    log.info(f'  gtf: {args.gtf[0]}')
+    log.info(f'  label: {args.label[0]}')
 
     return
 
