@@ -36,6 +36,9 @@ def prepare_parser():
                     format='%(levelname)-8s: %(message)s',
                     datefmt='%m-%d %H:%M')
 
+    mpl_logger = logging.getLogger('matplotlib') # Bodge to silence the matplotlib logging
+    mpl_logger.setLevel(logging.WARNING)
+
     parser.log = logging.getLogger('nmdetect')
 
     return parser
@@ -52,6 +55,10 @@ def main():
     log.info('Arguments:')
     log.info(f'  gtf: {args.gtf[0]}')
     log.info(f'  label: {args.label[0]}')
+
+    n = nmdectectiveb.NMDB(log=log)
+    n.score(args.gtf[0])
+    n.plots(args.label[0])
 
     return
 

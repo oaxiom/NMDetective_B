@@ -35,6 +35,9 @@ class NMDB:
             gtfoh = open(filename, "rt")
 
         for lin in gtfoh:
+            if lin[0] == '#':
+                continue
+
             l = lin.strip().split('\t')
 
             # Try to do some quick fails to speed up
@@ -107,9 +110,8 @@ class NMDB:
         # First make bundles for each transcript
         transcript_bundles = {}
         for idx, item in enumerate(self.gtf_parser(gtf_filename)):
-            if idx > 0 and idx % 1e4 == 0:
+            if idx > 0 and idx % 1e6 == 0:
                 self.log.info(f'{idx:,} done')
-                break
 
             if item['gene_type'] != 'protein_coding':
                 continue
@@ -123,7 +125,6 @@ class NMDB:
             transcript_bundles[item['transcript_id']].append(item)
 
         self.log.info(f'Processed {idx:,} entries in the GTF')
-        self.log.info(f'Found {len(transcript_bundles):,} transcripts')
 
         for transcript_id, transcript in transcript_bundles.items():
             exonStarts = []
@@ -188,7 +189,7 @@ class NMDB:
                             orflength += exons[0] - exons[1]
 
             if START == 0 or STOP == 0:
-                log.info(f'{transcript_id} has no start_codon or stop_codon key in the GTF, skipping')
+                #self.log.info(f'{transcript_id} has no start_codon or stop_codon key in the GTF, skipping')
                 __skipped_no_start_stop += 1
                 continue
 
@@ -218,10 +219,12 @@ class NMDB:
             cats.append(nmd_class)
             scores.append(nmd_score)
 
+        self.log.info(f'Found {len(transcript_bundles):,} transcripts')
+
         self.scores = scores
         self.cats = cats
 
-        self.log.info(f'Skipped as no identifiable START/STOP: {__skipped_no_start_stop} transcripts')
+        self.log.info(f'Skipped as no identifiable START/STOP: {__skipped_no_start_stop:,} transcripts')
 
         return scores, cats
 
