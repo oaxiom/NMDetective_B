@@ -8,7 +8,7 @@ No setup.py (to come)
 In the meantime, put NMDetective_B/bin on your PATH
 
 ## Usage
-
+```
 nmdetect -h
 usage: nmdetect [-h] -g GTF -l LABEL
 
@@ -20,12 +20,12 @@ required arguments:
   -l LABEL, --label LABEL
                         a label for the output files
 
-Example usage: nmdetect -g gtf_file -l outputlabel
-
+Example usage: nmdetect -g <gtf_file> -l <outputlabel>
+```
 ## Example
 
 Assuming you have the human gencode GTF:
-
+```
 nmdetect -g gencode.v42.annotation.gtf.gz -l gencode_v42
 INFO    : Arguments:
 INFO    :   gtf: gencode.v42.annotation.gtf.gz
@@ -39,5 +39,7 @@ INFO    : Found 170,279 transcripts
 INFO    : Skipped as no identifiable START/STOP: 90,263 transcripts
 2023-05-30 12:54:47.547 Python[18263:880366] ApplePersistenceIgnoreState: Existing state will not be touched. New state will be written to /var/folders/rr/jj3jkt7n0r73d5wyfdwpk01c0000gp/T/org.python.python.savedState
 INFO    : Drew Pie chart
+```
+
 
 ![gencode Analysis](https://github.com/oaxiom/NMDetective_B/blob/13f33ad729358afa23ac8b035a4cbee2dd581dbe/images/gencode_v42.pie.png)
