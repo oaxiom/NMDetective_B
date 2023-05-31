@@ -199,22 +199,33 @@ class NMDB:
             for exon_num, exons in enumerate(zip(exonStarts, exonEnds)):
                 if STOP >= exons[0] and STOP <= exons[1]:
                     if strand == '+':
-                        d = exons[1] - STOP
+                        d = STOP - exons[0]
                         if exon_num == len(exonEnds)-1:
                             inlastexon = True
-                        if d < 50:
+                        if exon_num == len(exonEnds)-2 and d < 50: # 50 bp of penultimate exon
                             within_50nt_of_lastEJ = True
-
                     else:
-                        d = STOP - exons[0]
-                        if exon_num == 0:
-                            inlastexon = True
-                        if d < 50:
-                            within_50nt_of_lastEJ = True
-
+                        1/0 # Should be impossible to reach here;
                     exonlength = exons[1] - exons[0]
 
+                if STOP >= exons[1] and STOP <= exons[0]:
+                    if strand == '-':
+                        d = exons[0] - STOP
+                        if exon_num == 0:
+                            inlastexon = True
+                        if exon_num == 1 and d < 50: # 50 bp of penultimate exon
+                            within_50nt_of_lastEJ = True
+                    else:
+                        1/0 # Should be impossible to reach here;
+
+                    # If STOP is in this exon;
+                    exonlength = exons[0] - exons[1]
+
+            #print(strand, exonlength)
+
+            print(inlastexon, orflength, exonlength, within_50nt_of_lastEJ)
             nmd_score, nmd_class = self.NMDetective_B_score(inlastexon, orflength, exonlength, within_50nt_of_lastEJ)
+            print(transcript_id, nmd_class, START, STOP)
 
             cats.append(nmd_class)
             scores.append(nmd_score)
@@ -235,11 +246,33 @@ class NMDB:
         '''
         # Pie chart;
 
-        pie_summ = Counter(self.cats)
+        # I want the categories to be in order:
+        pie_summ = {
+            'Last exon\n(Score=0.0)': 0.0,
+            'Start-proximal\n(Score=0.12)': 0.0,
+            '50 nt rule\n(Score=0.20)': 0.0,
+            'Long exon\n(Score=0.41)': 0.0,
+            'Trigger NMD\n(Score=0.65)': 0.0,
+            }
+
+        cols = [
+            'lightgrey',
+            'grey',
+            'gold',
+            'darkorange',
+            'darkred',
+            ]
+
+        for c in self.cats:
+            pie_summ[c] += 1
+
         fig = plot.figure(figsize=[3,3])
         ax = fig.add_subplot(111)
         ax.pie(pie_summ.values(), labels=pie_summ.keys(), autopct='%1.1f%%',
-            textprops={'fontsize': 6})
+            textprops={'fontsize': 6},
+            colors=cols,
+            startangle=90,
+            counterclock=False,)
         fig.savefig(f'{label}.pie.pdf')
         self.log.info('Drew Pie chart')
 
@@ -258,5 +291,5 @@ if __name__ == '__main__':
     mpl_logger.setLevel(logging.WARNING)
 
     n = NMDB(log=log)
-    n.score('../test/test_gtf.gtf.gz')
-    n.plots('../test/test')
+    n.score('../test/hg38.gencode.v42.top100k.gtf.gz')
+    n.plots('../test/hg38.gencode.v42.top100k')
