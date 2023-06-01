@@ -54,7 +54,7 @@ class NMDB:
                 'feature': l[2],
                 'strand': l[6],
                 'gene_type': 'protein_coding',
-                'transcript_id': l[8][tid:].split(' ')[1].strip('"')
+                'transcript_id': l[8][tid:].split(' ')[1].strip(';').strip('"')
                 }
 
             '''

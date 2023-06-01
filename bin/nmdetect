@@ -58,6 +58,7 @@ def main():
 
     n = nmdectectiveb.NMDB(log=log)
     n.score(args.gtf[0])
+    n.save_tid_table(f'{args.label[0]}.tidtable.tsv')
     n.plots(args.label[0])
 
     return
