@@ -40,5 +40,22 @@ INFO    : Skipped as no identifiable START/STOP: 90,263 transcripts
 INFO    : Drew Pie chart
 ```
 
+## Benchmarking
 
-![gencode Analysis](https://github.com/oaxiom/NMDetective_B/blob/13f33ad729358afa23ac8b035a4cbee2dd581dbe/images/gencode_v42.pie.png)
+Expected NMD scores from the Lindeboom UCSC track and GTF:
+
+![Expected](https://github.com/oaxiom/NMDetective_B/blob/289adc8e7dbe9e612d51554f4b5618f06202338e/observed_expected/expected.Lindeboom.pdf)
+
+Observed NMD scores from nmdetect
+
+![Observed](https://github.com/oaxiom/NMDetective_B/blob/289adc8e7dbe9e612d51554f4b5618f06202338e/observed_expected/observed.pie.pdf)
+
+## Reference
+
+GENCODE hg38
+
+![GENCODE hg38](https://github.com/oaxiom/NMDetective_B/blob/97046bed4f7c219b9209c8186b631f1a30c27b7f/images/gencode_v42.pie.pdf)
+
+GENCODE mm10
+
+![GENCODE mm10](https://github.com/oaxiom/NMDetective_B/blob/97046bed4f7c219b9209c8186b631f1a30c27b7f/images/gencode_vM20.pie.pdf)
