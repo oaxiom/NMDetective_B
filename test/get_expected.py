@@ -45,8 +45,8 @@ print(f'Found {len(nmds):,} scores')
 pie_summ = {
     'Last exon\n(Score=0.0)': 0.0,
     'Start-proximal\n(Score=0.12)': 0.0,
-    'Long exon\n(Score=0.41)': 0.0,
     '50 nt rule\n(Score=0.20)': 0.0,
+    'Long exon\n(Score=0.41)': 0.0,
     'Trigger NMD\n(Score=0.65)': 0.0,
     }
 
@@ -64,9 +64,20 @@ for s in nmds:
     else:
         print('No sum!', s)
 
-fig = plot.figure(figsize=[2,2])
+cols = [
+    'lightgrey',
+    'grey',
+    'gold',
+    'darkorange',
+    'darkred',
+    ]
+
+fig = plot.figure(figsize=[3,3])
 ax = fig.add_subplot(111)
 ax.pie(pie_summ.values(), labels=pie_summ.keys(), autopct='%1.1f%%',
-    textprops={'fontsize': 4})
-fig.savefig(f'expected.hg38.knownGene.pdf')
+            textprops={'fontsize': 6},
+            colors=cols,
+            startangle=90,
+            counterclock=False,)
+fig.savefig(f'expected.Lindeboom.pdf')
 print('Done')

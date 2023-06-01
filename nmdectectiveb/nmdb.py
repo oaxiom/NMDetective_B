@@ -44,10 +44,9 @@ class NMDB:
             if l[2] == 'gene': # No useful data here
                 continue
 
-            if 'protein_coding' not in l[8]:
-                continue
-
             tid = l[8].find('transcript_id')
+
+            #print(l[8][tid:])
 
             r = {'chrom': l[0],
                 'left': int(l[3]),
@@ -55,7 +54,7 @@ class NMDB:
                 'feature': l[2],
                 'strand': l[6],
                 'gene_type': 'protein_coding',
-                'transcript_id': l[8][tid:tid+50].split('"')[1]
+                'transcript_id': l[8][tid:].split(' ')[1].strip('"')
                 }
 
             '''
@@ -103,6 +102,7 @@ class NMDB:
 
         scores = []
         cats = []
+        tid_table = {}
 
         # STATS
         __skipped_no_start_stop = 0
@@ -116,7 +116,7 @@ class NMDB:
             if item['gene_type'] != 'protein_coding':
                 continue
 
-            if item['feature'] == 'gene': # No useful data here
+            if item['feature'] not in set(['exon', 'start_codon', 'stop_codon']):
                 continue
 
             if item['transcript_id'] not in transcript_bundles:
@@ -149,7 +149,7 @@ class NMDB:
                         exonStarts.append(entry['right'])
                         exonEnds.append(entry['left'])
 
-            # I need to wqork out the orflength
+            # I need to work out the orflength
             orflength = 0 # currently wrong...
             for exon_num, exons in enumerate(zip(exonStarts, exonEnds)):
                 if strand == '+':
@@ -223,21 +223,38 @@ class NMDB:
 
             #print(strand, exonlength)
 
-            print(inlastexon, orflength, exonlength, within_50nt_of_lastEJ)
+            #print(inlastexon, orflength, exonlength, within_50nt_of_lastEJ)
             nmd_score, nmd_class = self.NMDetective_B_score(inlastexon, orflength, exonlength, within_50nt_of_lastEJ)
-            print(transcript_id, nmd_class, START, STOP)
+            #print(transcript_id, nmd_class, START, STOP)
 
             cats.append(nmd_class)
             scores.append(nmd_score)
+            tid_table[transcript_id] = (nmd_score, nmd_class.replace('\n', ' '))
 
         self.log.info(f'Found {len(transcript_bundles):,} transcripts')
 
         self.scores = scores
         self.cats = cats
+        self.tid_table = tid_table
 
         self.log.info(f'Skipped as no identifiable START/STOP: {__skipped_no_start_stop:,} transcripts')
 
         return scores, cats
+
+    def save_tid_table(self, filename):
+        '''
+        **Purpose**
+
+            Save a table of transcript_id and NMD score
+
+        '''
+
+        oh = open(filename, 'wt')
+        for tid in sorted(self.tid_table):
+            oh.write(f'{tid}\t{self.tid_table[tid][0]}\t{self.tid_table[tid][1]}\n')
+
+        oh.close()
+
 
     def plots(self, label):
         '''
@@ -292,4 +309,5 @@ if __name__ == '__main__':
 
     n = NMDB(log=log)
     n.score('../test/hg38.gencode.v42.top100k.gtf.gz')
+    n.save_tid_table('../test/hg38.gencode.v42.top100k.tid_table.tsv')
     n.plots('../test/hg38.gencode.v42.top100k')
