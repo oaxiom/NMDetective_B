@@ -44,18 +44,18 @@ INFO    : Drew Pie chart
 
 Expected NMD scores from the Lindeboom UCSC track and GTF:
 
-![Expected](https://github.com/oaxiom/NMDetective_B/blob/289adc8e7dbe9e612d51554f4b5618f06202338e/observed_expected/expected.Lindeboom.pdf)
+![Expected](https://github.com/oaxiom/NMDetective_B/blob/9dc73694409bbe4806aafdec0df850c05716cb9c/observed_expected/expected.Lindeboom.png)
 
 Observed NMD scores from nmdetect
 
-![Observed](https://github.com/oaxiom/NMDetective_B/blob/289adc8e7dbe9e612d51554f4b5618f06202338e/observed_expected/observed.pie.pdf)
+![Observed](https://github.com/oaxiom/NMDetective_B/blob/9dc73694409bbe4806aafdec0df850c05716cb9c/observed_expected/observed.pie.png)
 
 ## Reference
 
-GENCODE hg38
+GENCODE hg38 (v42)
 
 ![GENCODE hg38](https://github.com/oaxiom/NMDetective_B/blob/97046bed4f7c219b9209c8186b631f1a30c27b7f/images/gencode_v42.pie.pdf)
 
-GENCODE mm10
+GENCODE mm10 (vM20)
 
 ![GENCODE mm10](https://github.com/oaxiom/NMDetective_B/blob/97046bed4f7c219b9209c8186b631f1a30c27b7f/images/gencode_vM20.pie.pdf)
