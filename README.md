@@ -44,18 +44,18 @@ INFO    : Drew Pie chart
 
 Expected NMD scores from the Lindeboom UCSC track and GTF:
 
-![Expected](https://github.com/oaxiom/NMDetective_B/blob/9dc73694409bbe4806aafdec0df850c05716cb9c/observed_expected/expected.Lindeboom.png)
+![Expected](https://github.com/oaxiom/NMDetective_B/blob/9dc73694409bbe4806aafdec0df850c05716cb9c/observed_expected/expected.Lindeboom.png){width=100px}
 
 Observed NMD scores from nmdetect
 
-![Observed](https://github.com/oaxiom/NMDetective_B/blob/9dc73694409bbe4806aafdec0df850c05716cb9c/observed_expected/observed.pie.png)
+![Observed](https://github.com/oaxiom/NMDetective_B/blob/9dc73694409bbe4806aafdec0df850c05716cb9c/observed_expected/observed.pie.png){width=100px}
 
 ## Reference
 
 GENCODE hg38 (v42)
 
-![GENCODE hg38](https://github.com/oaxiom/NMDetective_B/blob/97046bed4f7c219b9209c8186b631f1a30c27b7f/images/gencode_v42.pie.pdf)
+![GENCODE hg38](https://github.com/oaxiom/NMDetective_B/blob/4419f5dd48a7dd45806a7401bb702d84ffb2336f/images/gencode_v42.pie.png){width=100px}
 
 GENCODE mm10 (vM20)
 
-![GENCODE mm10](https://github.com/oaxiom/NMDetective_B/blob/97046bed4f7c219b9209c8186b631f1a30c27b7f/images/gencode_vM20.pie.pdf)
+![GENCODE mm10](https://github.com/oaxiom/NMDetective_B/blob/4419f5dd48a7dd45806a7401bb702d84ffb2336f/images/gencode_vM20.pie.png){width=100px}
