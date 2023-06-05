@@ -146,4 +146,5 @@ ax.pie(pie_summ.values(), labels=pie_summ.keys(), autopct='%1.1f%%',
             startangle=90,
             counterclock=False,)
 fig.savefig(f'expected.Lindeboom.pdf')
+fig.savefig(f'expected.Lindeboom.png')
 print('Done')
