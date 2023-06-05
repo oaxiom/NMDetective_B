@@ -23,7 +23,7 @@ class NMDB:
 
     def gtf_parser(self, filename, gziped=False):
         '''
-        Simple parser for GFT
+        Simple parser for GTF
         '''
 
         if filename.endswith('.gz'):
@@ -45,8 +45,11 @@ class NMDB:
                 continue
 
             tid = l[8].find('transcript_id')
-
-            #print(l[8][tid:])
+            if 'exon_num' in l[8]:
+                enu = l[8].find('exon_num')
+                exon_num = l[8][enu:enu+17].split(' ')[1].strip(';').strip('"')
+            else:
+                exon_num = 0
 
             r = {'chrom': l[0],
                 'left': int(l[3]),
@@ -54,7 +57,8 @@ class NMDB:
                 'feature': l[2],
                 'strand': l[6],
                 'gene_type': 'protein_coding',
-                'transcript_id': l[8][tid:].split(' ')[1].strip(';').strip('"')
+                'transcript_id': l[8][tid:].split(' ')[1].strip(';').strip('"'),
+                'exon_num': int(exon_num),
                 }
 
             '''
@@ -109,6 +113,7 @@ class NMDB:
 
         # First make bundles for each transcript
         transcript_bundles = {}
+        exon_num = 0
         for idx, item in enumerate(self.gtf_parser(gtf_filename)):
             if idx > 0 and idx % 1e6 == 0:
                 self.log.info(f'{idx:,} done')
@@ -118,6 +123,9 @@ class NMDB:
 
             if item['feature'] not in set(['exon', 'start_codon', 'stop_codon']):
                 continue
+
+            if item['feature'] == 'exon':
+                exon_num += 1
 
             if item['transcript_id'] not in transcript_bundles:
                 transcript_bundles[item['transcript_id']] = []
@@ -129,6 +137,7 @@ class NMDB:
         for transcript_id, transcript in transcript_bundles.items():
             exonStarts = []
             exonEnds   = []
+            exonNums   = []
             # I need to convert the transcript bundle into:
             chrom = transcript[0]['chrom']
             strand = transcript[0]['strand']
@@ -148,10 +157,16 @@ class NMDB:
                     else:
                         exonStarts.append(entry['right'])
                         exonEnds.append(entry['left'])
+                    exonNums.append(entry['exon_num'])
+
+            exonStarts.sort() # seems they can be any order in the GFT. So put them in a specific order that I expect.
+            exonEnds.sort()
+
+            total_exons = len(exonStarts)
 
             # I need to work out the orflength
             orflength = 0 # currently wrong...
-            for exon_num, exons in enumerate(zip(exonStarts, exonEnds)):
+            for exons in zip(exonStarts, exonEnds):
                 if strand == '+':
                     if START >= exons[0] and START <= exons[1] and STOP >= exons[0] and STOP <= exons[1]:
                         # START and STOP are in the same exon
@@ -196,36 +211,38 @@ class NMDB:
             inlastexon = False
             within_50nt_of_lastEJ = False
 
-            for exon_num, exons in enumerate(zip(exonStarts, exonEnds)):
-                if STOP >= exons[0] and STOP <= exons[1]:
+            for e0, e1, exon_num in zip(exonStarts, exonEnds, exonNums):
+                #print(transcript)
+                #print(exonStarts, exonEnds)
+                #print(STOP, exons, exon_num, total_exons)
+                if STOP >= e0 and STOP <= e1:
                     if strand == '+':
-                        d = STOP - exons[0]
-                        if exon_num == len(exonEnds)-1:
+                        d = STOP - e0
+                        if exon_num == total_exons:
                             inlastexon = True
-                        if exon_num == len(exonEnds)-2 and d < 50: # 50 bp of penultimate exon
+                        if exon_num == total_exons-1 and d < 50: # 50 bp of penultimate exon
                             within_50nt_of_lastEJ = True
                     else:
                         1/0 # Should be impossible to reach here;
-                    exonlength = exons[1] - exons[0]
+                    exonlength = e1 - e0
 
-                if STOP >= exons[1] and STOP <= exons[0]:
+                if STOP >= e1 and STOP <= e0:
                     if strand == '-':
-                        d = exons[0] - STOP
-                        if exon_num == 0:
+                        d = e0 - STOP
+                        if exon_num == 1:
                             inlastexon = True
-                        if exon_num == 1 and d < 50: # 50 bp of penultimate exon
+                        if exon_num == 2 and d < 50: # 50 bp of penultimate exon
                             within_50nt_of_lastEJ = True
                     else:
                         1/0 # Should be impossible to reach here;
-
-                    # If STOP is in this exon;
-                    exonlength = exons[0] - exons[1]
+                    exonlength = e0 - e1
 
             #print(strand, exonlength)
 
             #print(inlastexon, orflength, exonlength, within_50nt_of_lastEJ)
             nmd_score, nmd_class = self.NMDetective_B_score(inlastexon, orflength, exonlength, within_50nt_of_lastEJ)
             #print(transcript_id, nmd_class, START, STOP)
+            #print()
 
             cats.append(nmd_class)
             scores.append(nmd_score)
